@@ -18,16 +18,17 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 @AllArgsConstructor
 public class EventService {
 
-    private final EventRepository eventRepository;
+    private final EventRepository repository;
 
-    public void notifyEnding(Event event){
-        event.setOrderId(event.getOrderId());
+    public void notifyEnding(Event event) {
+        event.setOrderId(event.getPayload().getId());
         event.setCreatedAt(LocalDateTime.now());
-        log.info("Order {} with saga notified! Transaction ID: {}", event.getOrderId(), event.getTransactionId());
+        save(event);
+        log.info("Order {} with saga notified! TransactionId: {}", event.getOrderId(), event.getTransactionId());
     }
 
-    public List<Event> findAll(){
-        return eventRepository.findAllByOrderByCreatedAtDesc();
+    public List<Event> findAll() {
+        return repository.findAllByOrderByCreatedAtDesc();
     }
 
     public Event findByFilters(EventFilters filters) {
@@ -46,18 +47,18 @@ public class EventService {
     }
 
     private Event findByTransactionId(String transactionId) {
-        return eventRepository
+        return repository
                 .findTop1ByTransactionIdOrderByCreatedAtDesc(transactionId)
                 .orElseThrow(() -> new ValidationException("Event not found by transactionId."));
     }
 
     private Event findByOrderId(String orderId) {
-        return eventRepository
+        return repository
                 .findTop1ByOrderIdOrderByCreatedAtDesc(orderId)
                 .orElseThrow(() -> new ValidationException("Event not found by orderID."));
     }
 
     public Event save(Event event) {
-        return eventRepository.save(event);
+        return repository.save(event);
     }
 }
