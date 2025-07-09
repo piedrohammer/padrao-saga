@@ -1,1 +1,1 @@
-Projeto usando o Padrão Saga Orquestrado
+Projeto para estudos usando o Padrão Saga Orquestrado!
